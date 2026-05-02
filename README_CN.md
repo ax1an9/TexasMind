@@ -2,7 +2,7 @@
 
 [English](./README.md)
 
-一个支持 AI 对手的多人在线德州扑克游戏。采用 Java Spring Boot 后端、Python LangChain ReAct AI 代理和 React 前端的三层架构。
+一个支持 AI 对手的多人在线德州扑克游戏。采用 Java Spring Boot 后端、Python LangChain ReAct AI 代理和 React 前端的三层架构。如果本项目对您有所帮助，欢迎点Star。
 
 ## 系统架构
 
