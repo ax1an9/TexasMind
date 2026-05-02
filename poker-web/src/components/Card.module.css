@@ -1,0 +1,52 @@
+.card {
+  width: 52px;
+  height: 72px;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s;
+  flex-shrink: 0;
+}
+
+.card:hover {
+  transform: translateY(-4px);
+}
+
+.card:not(.back) {
+  background: #fff;
+  border: 1px solid #ddd;
+}
+
+.rank {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.suit {
+  font-size: 24px;
+  line-height: 1;
+  margin-top: 2px;
+}
+
+.back {
+  background: linear-gradient(135deg, #1a237e, #283593);
+  border: 2px solid #3949ab;
+}
+
+.backPattern {
+  width: 32px;
+  height: 48px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  background: repeating-linear-gradient(
+    45deg,
+    transparent,
+    transparent 4px,
+    rgba(255, 255, 255, 0.1) 4px,
+    rgba(255, 255, 255, 0.1) 8px
+  );
+}

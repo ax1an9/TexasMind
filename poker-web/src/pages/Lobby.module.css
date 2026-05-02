@@ -1,0 +1,158 @@
+.lobby {
+  min-height: 100vh;
+  background: #0f1923;
+  color: #ecf0f1;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 32px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.title {
+  margin: 0;
+  font-size: 24px;
+  color: #f0c040;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: #bdc3c7;
+}
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #2ecc71;
+}
+
+.content {
+  max-width: 700px;
+  margin: 0 auto;
+  padding: 32px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 18px;
+  color: #ecf0f1;
+}
+
+.createBtn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  background: #3498db;
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.createBtn:hover { background: #2980b9; }
+
+.empty {
+  text-align: center;
+  padding: 60px 0;
+  color: #7f8c8d;
+  font-size: 15px;
+}
+
+.roomList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.roomCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 10px;
+  transition: background 0.2s;
+}
+
+.roomCard:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.roomInfo {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.roomName {
+  font-weight: 600;
+  font-size: 15px;
+}
+
+.roomMeta {
+  color: #95a5a6;
+  font-size: 13px;
+}
+
+.status {
+  font-size: 12px;
+  padding: 3px 10px;
+  border-radius: 20px;
+  font-weight: 600;
+}
+
+.status.waiting {
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+.status.playing {
+  background: rgba(241, 196, 15, 0.2);
+  color: #f1c40f;
+}
+
+.status.game_over {
+  background: rgba(155, 89, 182, 0.2);
+  color: #9b59b6;
+}
+
+.status.closed {
+  background: rgba(231, 76, 60, 0.2);
+  color: #e74c3c;
+}
+
+.joinBtn {
+  padding: 8px 18px;
+  border: 1px solid rgba(52, 152, 219, 0.5);
+  border-radius: 6px;
+  background: transparent;
+  color: #3498db;
+  font-weight: 600;
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.joinBtn:hover:not(:disabled) {
+  background: rgba(52, 152, 219, 0.15);
+}
+
+.joinBtn:disabled {
+  opacity: 0.3;
+  cursor: not-allowed;
+}

@@ -1,0 +1,25 @@
+name: ProPokerAgent
+mode: advisor
+
+llm:
+  provider: anthropic
+  model: claude-3-5-sonnet-latest
+  api_key: ${ANTHROPIC_API_KEY}
+  temperature: 0.2
+  max_tokens: 1200
+
+tools:
+  hand_evaluation:
+    enabled: true
+  pot_odds:
+    enabled: true
+  opponent_modeling:
+    enabled: false
+  history_analysis:
+    enabled: true
+
+memory:
+  hand_memory: true
+  opponent_memory: true
+  session_memory: true
+  persistence: memory

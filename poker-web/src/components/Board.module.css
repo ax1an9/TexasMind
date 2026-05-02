@@ -1,0 +1,26 @@
+.board {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.cards {
+  display: flex;
+  gap: 8px;
+}
+
+.placeholder {
+  width: 52px;
+  height: 72px;
+  border-radius: 8px;
+  border: 2px dashed rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.pot {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f0c040;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+}

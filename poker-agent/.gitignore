@@ -1,0 +1,10 @@
+.venv/
+__pycache__/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+*.egg-info/
+src/poker_agent/grpc/generated/*_pb2.py
+src/poker_agent/grpc/generated/*_pb2_grpc.py

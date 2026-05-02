@@ -1,0 +1,148 @@
+syntax = "proto3";
+
+package poker_agent;
+
+service PokerAgent {
+  rpc Register(RegisterRequest) returns (RegisterResponse);
+  rpc MakeDecision(DecisionRequest) returns (ActionResponse);
+  rpc Ping(PingRequest) returns (PingResponse);
+}
+
+message RegisterRequest {
+  string agent_id = 1;
+  string agent_name = 2;
+  string agent_type = 3;
+}
+
+message RegisterResponse {
+  bool success = 1;
+  string message = 2;
+}
+
+message DecisionRequest {
+  string game_id = 1;
+  GameStateView game_state = 2;
+  repeated LegalAction legal_actions = 3;
+  TimingInfo timing = 4;
+}
+
+message GameStateView {
+  GamePhase phase = 1;
+  repeated Card board = 2;
+  PlayerView self = 3;
+  repeated PlayerSummary opponents = 4;
+  PotInfo pot = 5;
+  repeated ActionEntry action_history = 6;
+  int32 dealer_position = 7;
+  int32 current_bet = 8;
+}
+
+message PlayerView {
+  string seat_id = 1;
+  int32 chips = 2;
+  repeated Card hole_cards = 3;
+  int32 round_contribution = 4;
+  bool is_all_in = 5;
+  bool is_folded = 6;
+}
+
+message PlayerSummary {
+  string seat_id = 1;
+  int32 chips = 2;
+  int32 round_contribution = 3;
+  bool is_all_in = 4;
+  bool is_folded = 5;
+}
+
+message LegalAction {
+  ActionType type = 1;
+  int32 min_amount = 2;
+  int32 max_amount = 3;
+  bool is_available = 4;
+}
+
+message ActionResponse {
+  ActionType action_type = 1;
+  int32 amount = 2;
+  string reasoning = 3;
+  string execution_path = 4;   // "llm" or "heuristic"
+  float confidence = 5;
+  int64 decision_latency_ms = 6;
+  string raw_output = 7;       // full ReAct reasoning trace
+}
+
+message TimingInfo {
+  int64 decision_deadline_ms = 1;
+  int32 max_think_time_ms = 2;
+}
+
+enum GamePhase {
+  PRE_FLOP = 0;
+  FLOP = 1;
+  TURN = 2;
+  RIVER = 3;
+  SHOWDOWN = 4;
+  SETTLED = 5;
+}
+
+enum ActionType {
+  FOLD = 0;
+  CHECK = 1;
+  CALL = 2;
+  BET = 3;
+  RAISE = 4;
+  ALL_IN = 5;
+}
+
+message Card {
+  Rank rank = 1;
+  Suit suit = 2;
+}
+
+enum Rank {
+  TWO = 0;
+  THREE = 1;
+  FOUR = 2;
+  FIVE = 3;
+  SIX = 4;
+  SEVEN = 5;
+  EIGHT = 6;
+  NINE = 7;
+  TEN = 8;
+  JACK = 9;
+  QUEEN = 10;
+  KING = 11;
+  ACE = 12;
+}
+
+enum Suit {
+  HEARTS = 0;
+  DIAMONDS = 1;
+  CLUBS = 2;
+  SPADES = 3;
+}
+
+message PotInfo {
+  int32 total_pot = 1;
+  int32 main_pot = 2;
+  repeated PotSlice side_pots = 3;
+}
+
+message PotSlice {
+  int32 amount = 1;
+  repeated string eligible_seat_ids = 2;
+}
+
+message ActionEntry {
+  string seat_id = 1;
+  ActionType action_type = 2;
+  int32 amount = 3;
+  GamePhase phase = 4;
+}
+
+message PingRequest {}
+
+message PingResponse {
+  bool success = 1;
+  string server_version = 2;
+}

@@ -1,0 +1,59 @@
+.panel {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 10px;
+  flex-wrap: wrap;
+}
+
+.hintBtn {
+  padding: 8px 16px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  background: rgba(155, 89, 182, 0.3);
+  color: #d5b8ff;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.hintBtn:hover:not(:disabled) {
+  background: rgba(155, 89, 182, 0.5);
+}
+
+.hintBtn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.result {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.label {
+  color: #95a5a6;
+  font-size: 13px;
+}
+
+.action {
+  color: #f0c040;
+  font-weight: 700;
+  font-size: 15px;
+}
+
+.detail {
+  color: #bdc3c7;
+  font-size: 13px;
+}
+
+.reasoning {
+  color: #7f8c8d;
+  font-size: 12px;
+  font-style: italic;
+}

@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(java -version)",
+      "Bash(mvn --version)",
+      "Bash(mvn compile *)",
+      "Bash(mvn install *)",
+      "Bash(mvn test *)",
+      "Bash(npm create *)",
+      "Bash(npm install *)",
+      "Bash(npx vite *)",
+      "Bash(npm run *)",
+      "Bash(python -m pytest tests/ -v)",
+      "Bash(python3 -m pytest tests/ -v)",
+      "Bash(uv sync *)",
+      "Bash(uv run *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(.venv/bin/python -m pytest tests/ -v)",
+      "Bash(.venv/bin/python -m pytest tests/unit/test_persistence.py -v)",
+      "Bash(.venv/bin/python *)",
+      "Bash(mvn clean *)",
+      "Bash(timeout 15 mvn spring-boot:run -pl poker-server)",
+      "Bash(timeout 20 mvn spring-boot:run -pl poker-server)",
+      "Bash(uv pip *)",
+      "Bash(/mnt/d/workspace/texas/poker-agent/.venv/bin/python *)"
+    ]
+  },
+  "enabledPlugins": {
+    "jdtls-lsp@claude-plugins-official": true
+  }
+}
