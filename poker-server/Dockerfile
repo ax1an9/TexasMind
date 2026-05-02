@@ -1,6 +1,7 @@
 # -- build --
 FROM maven:3.9-eclipse-temurin-8 AS build
 WORKDIR /app
+COPY poker-server/settings.xml /root/.m2/settings.xml
 COPY pom.xml ./
 COPY poker-core/pom.xml poker-core/
 COPY poker-ai/pom.xml poker-ai/

@@ -20,6 +20,20 @@ flowchart LR
 - **后端** -- Spring Boot 2.7，管理房间、编排游戏流程、执行规则
 - **AI 代理** -- Python 3.11+，LangChain ReAct 代理，支持扑克工具和分层记忆
 
+## 游戏展示
+
+### 1. 进入游戏房间
+
+![进入游戏房间](static/game-room.png)
+
+### 2. 游戏进行中
+
+![游戏中](static/gaming.png)
+
+### 3. 游戏结束
+
+![游戏结束](static/game-end.png)
+
 ## 项目结构
 
 ```
@@ -110,7 +124,7 @@ React 前端，通过 STOMP over WebSocket 通信。
 | Maven | 3.8+ |
 | Python | 3.11+ |
 | [uv](https://docs.astral.sh/uv/) | 最新版 |
-| Node.js | 18+ |
+| Node.js | 20+ |
 
 ## 快速开始
 
@@ -166,7 +180,7 @@ docker compose up --build
 
 | 服务 | 地址 |
 |------|------|
-| 前端 | http://localhost |
+| 前端 | http://localhost:3000 |
 | 后端 | http://localhost:8080 |
 | AI 代理 | localhost:9090 (gRPC) |
 
@@ -277,7 +291,7 @@ service PokerAgent {
 
 | 服务 | 端口 | 协议 |
 |------|------|------|
-| 前端 | 5173 | HTTP |
+| 前端 | 3000 | HTTP |
 | 后端 | 8080 | HTTP / WebSocket (STOMP) |
 | AI 代理 | 9090 | gRPC |
 

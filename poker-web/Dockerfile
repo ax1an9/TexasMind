@@ -1,8 +1,8 @@
 # -- build --
-FROM node:18-alpine AS build
+FROM node:24-alpine AS build
 WORKDIR /app
 COPY package.json package-lock.json* ./
-RUN npm ci
+RUN npm ci --registry=https://registry.npmmirror.com
 COPY . .
 RUN npm run build
 

@@ -8,7 +8,7 @@
 | Maven | 3.8+ |
 | Python | 3.11+ |
 | [uv](https://docs.astral.sh/uv/) | 最新版 |
-| Node.js | 18+ |
+| Node.js | 20+ |
 
 ---
 

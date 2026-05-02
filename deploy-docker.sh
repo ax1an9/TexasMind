@@ -21,7 +21,7 @@ case "${1:-up}" in
         docker compose up --build -d
         echo ""
         echo "Services started:"
-        echo "  Frontend:  http://localhost"
+        echo "  Frontend:  http://localhost:3000"
         echo "  Backend:   http://localhost:8080"
         echo "  Agent:     localhost:9090 (gRPC)"
         echo ""

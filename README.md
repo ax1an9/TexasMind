@@ -21,6 +21,20 @@ flowchart LR
 - **Backend** -- Spring Boot 2.7, manages rooms, orchestrates game flow, enforces rules
 - **AI Agent** -- Python 3.11+, LangChain ReAct agent with poker tools and layered memory
 
+## Gameplay
+
+### 1. Enter Game Room
+
+![Enter Game Room](static/game-room.png)
+
+### 2. Playing
+
+![Playing](static/gaming.png)
+
+### 3. Game Over
+
+![Game Over](static/game-end.png)
+
 ## Project Structure
 
 ```
@@ -111,7 +125,7 @@ React frontend with STOMP over WebSocket.
 | Maven | 3.8+ |
 | Python | 3.11+ |
 | [uv](https://docs.astral.sh/uv/) | Latest |
-| Node.js | 18+ |
+| Node.js | 20+ |
 
 ## Quick Start
 
@@ -162,7 +176,7 @@ This starts all three services:
 
 | Service | URL |
 |---------|-----|
-| Frontend | http://localhost |
+| Frontend | http://localhost:3000 |
 | Backend | http://localhost:8080 |
 | AI Agent | localhost:9090 (gRPC) |
 
@@ -271,7 +285,7 @@ service PokerAgent {
 
 | Service | Port | Protocol |
 |---------|------|----------|
-| Frontend | 5173 | HTTP |
+| Frontend | 3000 | HTTP |
 | Backend | 8080 | HTTP / WebSocket (STOMP) |
 | AI Agent | 9090 | gRPC |
 
