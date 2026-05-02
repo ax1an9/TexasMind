@@ -1,0 +1,35 @@
+services:
+  agent:
+    build: ./poker-agent
+    ports:
+      - "9090:9090"
+    volumes:
+      - agent-data:/app/data
+    environment:
+      - LLM_PROVIDER=${LLM_PROVIDER:-openai}
+      - LLM_MODEL=${LLM_MODEL:-mimo-v2.5-pro}
+      - LLM_API_KEY=${LLM_API_KEY:-}
+      - LLM_BASE_URL=${LLM_BASE_URL:-}
+
+  backend:
+    build:
+      context: .
+      dockerfile: poker-server/Dockerfile
+    ports:
+      - "8080:8080"
+    depends_on:
+      - agent
+    command:
+      - "--agent.type=grpc"
+      - "--agent.grpc.host=agent"
+      - "--agent.grpc.port=9090"
+
+  frontend:
+    build: ./poker-web
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+
+volumes:
+  agent-data:

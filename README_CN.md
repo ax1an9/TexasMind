@@ -154,7 +154,43 @@ npm install
 npm run dev
 ```
 
-打开浏览器访问 http://localhost:5173
+打开浏览器访问 http://localhost:3000
+
+### Docker Compose 一键部署（推荐）
+
+```bash
+docker compose up --build
+```
+
+自动启动全部三个服务：
+
+| 服务 | 地址 |
+|------|------|
+| 前端 | http://localhost |
+| 后端 | http://localhost:8080 |
+| AI 代理 | localhost:9090 (gRPC) |
+
+自定义 LLM 配置：
+
+```bash
+LLM_API_KEY=sk-xxx LLM_MODEL=gpt-4o LLM_BASE_URL=https://api.openai.com/v1 docker compose up --build
+```
+
+或创建 `.env` 文件：
+
+```bash
+LLM_API_KEY=sk-xxx
+LLM_MODEL=gpt-4o
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_PROVIDER=openai
+```
+
+| 环境变量 | 默认值 | 说明 |
+|----------|--------|------|
+| `LLM_PROVIDER` | `openai` | LLM 提供商（`openai` / `anthropic` / `ollama` / `custom`） |
+| `LLM_MODEL` | `mimo-v2.5-pro` | 模型名称 |
+| `LLM_API_KEY` | *(空)* | API 密钥 |
+| `LLM_BASE_URL` | `https://token-plan-cn.xiaomimimo.com/v1` | API 基础 URL |
 
 ### 一键启动脚本
 
@@ -279,6 +315,29 @@ asyncio.run(check())
 ## API 文档
 
 完整的 WebSocket API 参考请见 [docs/api/server-api.md](docs/api/server-api.md)。
+
+## 开发路线图
+
+### 近期 (P0)
+
+- [x] Docker Compose 部署
+- [x] GitHub Actions CI（Java 测试、Python 测试、前端 lint）
+- [ ] 服务端游戏流程集成测试覆盖
+- [ ] `.env.example` 统一敏感配置管理
+
+### 中期 (P1)
+
+- [ ] 用户认证 / 会话持久化
+- [ ] 游戏回放查看器（前端播放 `data/replays/`）
+- [ ] Agent 决策面板 -- 推理日志和胜率统计
+- [ ] 前端国际化 (i18n)
+
+### 长期 (P2)
+
+- [ ] 高级 Agent 策略 -- GTO 求解器、Monte Carlo 模拟
+- [ ] 多模型 A/B 对比 -- 量化不同 LLM 的牌桌表现
+- [ ] WebSocket 消息鉴权 / 反作弊
+- [ ] 多房间并发场景性能压测
 
 ## 常见问题
 

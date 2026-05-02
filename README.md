@@ -150,7 +150,43 @@ npm install
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+Open http://localhost:3000 in your browser.
+
+### Docker Compose (Recommended)
+
+```bash
+docker compose up --build
+```
+
+This starts all three services:
+
+| Service | URL |
+|---------|-----|
+| Frontend | http://localhost |
+| Backend | http://localhost:8080 |
+| AI Agent | localhost:9090 (gRPC) |
+
+Custom LLM configuration:
+
+```bash
+LLM_API_KEY=sk-xxx LLM_MODEL=gpt-4o LLM_BASE_URL=https://api.openai.com/v1 docker compose up --build
+```
+
+Or create a `.env` file:
+
+```bash
+LLM_API_KEY=sk-xxx
+LLM_MODEL=gpt-4o
+LLM_BASE_URL=https://api.openai.com/v1
+LLM_PROVIDER=openai
+```
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `LLM_PROVIDER` | `openai` | LLM provider (`openai` / `anthropic` / `ollama` / `custom`) |
+| `LLM_MODEL` | `mimo-v2.5-pro` | Model name |
+| `LLM_API_KEY` | *(empty)* | API key |
+| `LLM_BASE_URL` | `https://token-plan-cn.xiaomimimo.com/v1` | API base URL |
 
 ### One-Click Start Script
 
@@ -242,6 +278,29 @@ service PokerAgent {
 ## API Reference
 
 See [docs/api/server-api.md](docs/api/server-api.md) for the full WebSocket API reference.
+
+## Roadmap
+
+### Near-term (P0)
+
+- [x] Docker Compose deployment
+- [x] GitHub Actions CI (Java tests, Python tests, frontend lint)
+- [ ] Integration test coverage for server game flow
+- [ ] `.env.example` for sensitive configuration
+
+### Mid-term (P1)
+
+- [ ] User authentication / session persistence
+- [ ] Game replay viewer (frontend playback of `data/replays/`)
+- [ ] Agent decision dashboard -- reasoning logs and win-rate stats
+- [ ] Frontend i18n (internationalization)
+
+### Long-term (P2)
+
+- [ ] Advanced agent strategies -- GTO solver, Monte Carlo simulation
+- [ ] Multi-model A/B testing -- compare LLM performance at the table
+- [ ] WebSocket message authentication / anti-cheat
+- [ ] Load testing for multi-room concurrent scenarios
 
 ## License
 
