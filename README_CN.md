@@ -2,7 +2,7 @@
 
 [English](./README.md)
 
-一个支持 AI 对手的多人在线德州扑克游戏。采用 Java Spring Boot 后端、Python LangChain ReAct AI 代理和 React 前端的三层架构。如果本项目对您有所帮助，欢迎点Star。
+一个支持 AI 对手的多人在线德州扑克游戏。采用 Java Spring Boot 后端、Python LangChain ReAct AI 代理、React 前端和 MongoDB 持久化玩家档案的三层架构。如果本项目对您有所帮助，欢迎点Star。
 
 ## 系统架构
 
@@ -17,8 +17,43 @@ flowchart LR
 
 **三层架构：**
 - **前端** -- React 19 + Vite，通过 STOMP over WebSocket (SockJS) 通信
-- **后端** -- Spring Boot 2.7，管理房间、编排游戏流程、执行规则
+- **后端** -- Spring Boot 2.7 + MongoDB，管理房间、编排游戏流程、执行规则、持久化玩家档案
 - **AI 代理** -- Python 3.11+，LangChain ReAct 代理，支持扑克工具和分层记忆
+
+## 核心功能
+
+### 玩家数据统计与档案系统
+
+自动追踪 7 项扑克统计数据，支持三个时间窗口（全部 / 最近 500 手 / 当前会话）：
+
+| 指标 | 说明 | 可见性 |
+|------|------|--------|
+| VPIP | 自愿入池率 | 公开 |
+| PFR | 翻牌前加注率 | 公开 |
+| 3Bet | 三次下注率 | 私有 |
+| AF | 激进因子 | 私有 |
+| WTSD | 摊牌率 | 私有 |
+| W$SD | 摊牌胜率 | 私有 |
+| Fold CB | 对持续下注弃牌率 | 私有 |
+
+根据 VPIP/PFR 比率自动分类玩家风格（紧凶 TAG、松凶 LAG、岩石、跟注站等）。数据持久化在 MongoDB 中，每手牌结束后自动更新。
+
+### 游戏内提示系统
+
+点击"获取提示"获得 AI 驱动的策略建议，支持三种查看模式：
+
+- **简洁模式** -- 图标 + 一句话建议
+- **标准模式** -- 建议动作 + 手牌强度/底池赔率进度条 + 推理说明
+- **详细模式** -- 完整因子分解（对子加成、同花加成、连牌加成、底池赔率计算）
+
+### 玩家 HUD 与档案页面
+
+- **PlayerHUD** -- 游戏内悬浮窗，展示所有玩家的公开数据（VPIP%、PFR%、手牌数）；点击展开可查看自己的私有数据
+- **档案页面** -- 独立页面，包含数据面板、颜色编码的质量指示器、玩家风格卡片，以及全部/近期/会话三个时间窗口切换
+
+### 国际化 (i18n)
+
+基于 `i18next` 支持三种语言：简体中文（`zh-CN`）、繁体中文（`zh-TW`）和英文（`en`）。语言偏好持久化在 localStorage 中。
 
 ## 游戏展示
 
@@ -30,7 +65,13 @@ flowchart LR
 
 ![游戏中](static/gaming.png)
 
-### 3. 游戏结束
+### 3. 数据分析与档案
+
+![数据分析与档案](static/gaming-analysis&profile.png)
+
+游戏内 PlayerHUD 实时展示对手数据（PFR、VPIP、手牌数），HintPanel 显示手牌强度分析与建议动作，Profile 页面以颜色编码的卡片展示统计数据和玩家风格分类。
+
+### 4. 游戏结束
 
 ![游戏结束](static/game-end.png)
 
@@ -86,6 +127,10 @@ Spring Boot 应用（端口 8080）。
 | `BroadcastService` | STOMP 消息广播 |
 | `GameStateProjection` | 将内部状态转换为客户端视图（隐藏对手手牌） |
 | `ReplayRecorder` | 记录牌局历史到 `data/replays/` |
+| `PlayerStatsService` | 牌局结算后处理统计数据，更新 MongoDB 玩家档案 |
+| `StatsCalculator` | 纯逻辑统计计算（VPIP、PFR、3Bet、AF、WTSD、W$SD、Fold CB） |
+| `PlayerProfile` | MongoDB 实体 -- 三个时间窗口的玩家数据 + 风格分类 |
+| `HintAdvisor` | 分析当前手牌，为人类玩家提供弃牌/跟注/加注提示 |
 
 ### poker-agent -- AI 代理
 
@@ -115,6 +160,11 @@ React 前端，通过 STOMP over WebSocket 通信。
 | `Game` | 游戏桌面、操作栏、Bot 管理 |
 | `Board` | 公共牌和底池显示 |
 | `ActionBar` | 玩家操作（弃牌/过牌/跟注/下注/加注/全押） |
+| `PlayerHUD` | 游戏内数据悬浮窗 -- 所有玩家公开数据，本人可展开查看私有数据 |
+| `Profile` | 档案页面 -- 数据面板、风格卡片、颜色编码指示器 |
+| `HintPanel` | 提示面板，支持 3 种查看模式（简洁/标准/详细） |
+| `usePlayerStats` | Hook，订阅 STOMP 主题获取实时数据更新 |
+| `i18n/` | i18next 配置，包含 6 个命名空间：common、game、lobby、profile、hint、room |
 
 ## 环境要求
 
@@ -125,6 +175,7 @@ React 前端，通过 STOMP over WebSocket 通信。
 | Python | 3.11+ |
 | [uv](https://docs.astral.sh/uv/) | 最新版 |
 | Node.js | 20+ |
+| MongoDB | 6.0+（可选，用于玩家数据持久化） |
 
 ## 快速开始
 
@@ -172,31 +223,49 @@ npm run dev
 
 ### Docker Compose 一键部署（推荐）
 
+Docker Compose 一键启动全部四个服务（前端、后端、AI 代理、MongoDB）：
+
 ```bash
 docker compose up --build
 ```
 
-自动启动全部三个服务：
+| 服务 | 地址 | 说明 |
+|------|------|------|
+| 前端 | http://localhost:3000 | React 应用 |
+| 后端 | http://localhost:8080 | Spring Boot API + WebSocket |
+| AI 代理 | localhost:9090 | Python gRPC 代理 |
+| MongoDB | localhost:27017 | 玩家档案存储 |
 
-| 服务 | 地址 |
-|------|------|
-| 前端 | http://localhost:3000 |
-| 后端 | http://localhost:8080 |
-| AI 代理 | localhost:9090 (gRPC) |
-
-自定义 LLM 配置：
+**自定义 LLM 配置** -- 直接传递环境变量：
 
 ```bash
 LLM_API_KEY=sk-xxx LLM_MODEL=gpt-4o LLM_BASE_URL=https://api.openai.com/v1 docker compose up --build
 ```
 
-或创建 `.env` 文件：
+或在项目根目录创建 `.env` 文件：
 
 ```bash
 LLM_API_KEY=sk-xxx
 LLM_MODEL=gpt-4o
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_PROVIDER=openai
+```
+
+**常用命令：**
+
+```bash
+# 后台启动（分离模式）
+docker compose up -d --build
+
+# 查看日志
+docker compose logs -f            # 所有服务
+docker compose logs -f backend    # 单个服务
+
+# 停止所有服务
+docker compose down
+
+# 停止并清除数据卷（清空 MongoDB 数据）
+docker compose down -v
 ```
 
 | 环境变量 | 默认值 | 说明 |
@@ -336,6 +405,9 @@ asyncio.run(check())
 
 - [x] Docker Compose 部署
 - [x] GitHub Actions CI（Java 测试、Python 测试、前端 lint）
+- [x] 前端国际化 (i18n)（zh-CN / zh-TW / en）
+- [x] 玩家数据统计与档案系统 (MongoDB)
+- [x] 游戏内提示系统（3 种查看模式）
 - [ ] 服务端游戏流程集成测试覆盖
 - [ ] `.env.example` 统一敏感配置管理
 
@@ -344,7 +416,6 @@ asyncio.run(check())
 - [ ] 用户认证 / 会话持久化
 - [ ] 游戏回放查看器（前端播放 `data/replays/`）
 - [ ] Agent 决策面板 -- 推理日志和胜率统计
-- [ ] 前端国际化 (i18n)
 
 ### 长期 (P2)
 

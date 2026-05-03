@@ -2,7 +2,7 @@
 
 [中文](./README_CN.md)
 
-A multiplayer Texas Hold'em poker game with an AI-powered opponent system. Features a Java Spring Boot backend, a LangChain ReAct AI agent in Python, and a React frontend.
+A multiplayer Texas Hold'em poker game with an AI-powered opponent system. Features a Java Spring Boot backend, a LangChain ReAct AI agent in Python, a React frontend, and MongoDB for player profile persistence.
 
 ## Architecture
 
@@ -18,8 +18,43 @@ flowchart LR
 **Three-tier architecture:**
 
 - **Frontend** -- React 19 + Vite, communicates via STOMP over WebSocket (SockJS)
-- **Backend** -- Spring Boot 2.7, manages rooms, orchestrates game flow, enforces rules
+- **Backend** -- Spring Boot 2.7 + MongoDB, manages rooms, orchestrates game flow, enforces rules, persists player profiles
 - **AI Agent** -- Python 3.11+, LangChain ReAct agent with poker tools and layered memory
+
+## Key Features
+
+### Player Stats & Profile System
+
+Tracks 7 poker statistics per player across three time windows (all-time / recent 500 hands / current session):
+
+| Stat | Description | Visibility |
+|------|-------------|------------|
+| VPIP | Voluntarily Put $ In Pot % | Public |
+| PFR | Pre-Flop Raise % | Public |
+| 3Bet | Three-Bet % | Private |
+| AF | Aggression Factor | Private |
+| WTSD | Went To Showdown % | Private |
+| W$SD | Won $ At Showdown % | Private |
+| Fold CB | Fold to Continuation Bet % | Private |
+
+Players are automatically classified into styles (TAG, LAG, Rock, Calling Station, etc.) based on VPIP/PFR ratios. Stats are persisted in MongoDB and updated after each hand.
+
+### In-Game Hint System
+
+Click "Get Hint" to receive AI-powered suggestions with three view modes:
+
+- **Simple** -- icon + one plain sentence
+- **Standard** -- suggested action + hand strength / pot odds progress bars + reasoning
+- **Detailed** -- full factor breakdown (pair bonus, suited bonus, connector bonus, pot-odds math)
+
+### PlayerHUD & Profile Page
+
+- **PlayerHUD** -- in-game overlay showing public stats (VPIP%, PFR%, hand count) for all players; expand to see your own private stats
+- **Profile Page** -- dedicated page with stats grid, color-coded quality indicators, player-style card, and tabs for all-time / recent / session windows
+
+### Internationalization (i18n)
+
+Three locales supported via `i18next`: Simplified Chinese (`zh-CN`), Traditional Chinese (`zh-TW`), and English (`en`). Language preference is persisted in localStorage.
 
 ## Gameplay
 
@@ -31,7 +66,13 @@ flowchart LR
 
 ![Playing](static/gaming.png)
 
-### 3. Game Over
+### 3. Stats & Analysis
+
+![Stats & Analysis](static/gaming-analysis&profile.png)
+
+In-game PlayerHUD showing real-time opponent stats (PFR, VPIP, hand count), HintPanel with hand strength analysis and suggested action, and the Profile page with color-coded stat cards and player style classification.
+
+### 4. Game Over
 
 ![Game Over](static/game-end.png)
 
@@ -87,6 +128,10 @@ Spring Boot application (port 8080).
 | `BroadcastService` | STOMP message broadcasting |
 | `GameStateProjection` | Converts internal state to client-facing view (hides opponent cards) |
 | `ReplayRecorder` | Records hand history to `data/replays/` |
+| `PlayerStatsService` | Post-hand stats processing -- updates MongoDB player profiles |
+| `StatsCalculator` | Pure-logic stats computation (VPIP, PFR, 3Bet, AF, WTSD, W$SD, Fold CB) |
+| `PlayerProfile` | MongoDB entity -- player stats across 3 time windows + style classification |
+| `HintAdvisor` | Analyzes current hand and provides fold/call/raise hints to human players |
 
 ### poker-agent
 
@@ -116,6 +161,11 @@ React frontend with STOMP over WebSocket.
 | `Game` | Game table, action bar, bot management |
 | `Board` | Community cards and pot display |
 | `ActionBar` | Player actions (fold/check/call/bet/raise/all-in) |
+| `PlayerHUD` | In-game stats overlay -- public stats for all, private stats for self |
+| `Profile` | Profile page -- stats grid, style card, color-coded indicators |
+| `HintPanel` | Hint display with 3 view modes (Simple / Standard / Detailed) |
+| `usePlayerStats` | Hook subscribing to STOMP topics for real-time stats updates |
+| `i18n/` | i18next setup with 6 namespaces: common, game, lobby, profile, hint, room |
 
 ## Prerequisites
 
@@ -126,6 +176,7 @@ React frontend with STOMP over WebSocket.
 | Python | 3.11+ |
 | [uv](https://docs.astral.sh/uv/) | Latest |
 | Node.js | 20+ |
+| MongoDB | 6.0+ (optional, for player stats persistence) |
 
 ## Quick Start
 
@@ -168,31 +219,49 @@ Open http://localhost:3000 in your browser.
 
 ### Docker Compose (Recommended)
 
+Docker Compose starts all four services (frontend, backend, AI agent, MongoDB) in one command:
+
 ```bash
 docker compose up --build
 ```
 
-This starts all three services:
+| Service | URL | Description |
+|---------|-----|-------------|
+| Frontend | http://localhost:3000 | React app |
+| Backend | http://localhost:8080 | Spring Boot API + WebSocket |
+| AI Agent | localhost:9090 | Python gRPC agent |
+| MongoDB | localhost:27017 | Player profile storage |
 
-| Service | URL |
-|---------|-----|
-| Frontend | http://localhost:3000 |
-| Backend | http://localhost:8080 |
-| AI Agent | localhost:9090 (gRPC) |
-
-Custom LLM configuration:
+**Custom LLM configuration** -- pass environment variables directly:
 
 ```bash
 LLM_API_KEY=sk-xxx LLM_MODEL=gpt-4o LLM_BASE_URL=https://api.openai.com/v1 docker compose up --build
 ```
 
-Or create a `.env` file:
+Or create a `.env` file in the project root:
 
 ```bash
 LLM_API_KEY=sk-xxx
 LLM_MODEL=gpt-4o
 LLM_BASE_URL=https://api.openai.com/v1
 LLM_PROVIDER=openai
+```
+
+**Useful commands:**
+
+```bash
+# Start in background (detached mode)
+docker compose up -d --build
+
+# View logs
+docker compose logs -f            # all services
+docker compose logs -f backend    # single service
+
+# Stop all services
+docker compose down
+
+# Stop and remove volumes (clears MongoDB data)
+docker compose down -v
 ```
 
 | Variable | Default | Description |
@@ -299,6 +368,9 @@ See [docs/api/server-api.md](docs/api/server-api.md) for the full WebSocket API 
 
 - [x] Docker Compose deployment
 - [x] GitHub Actions CI (Java tests, Python tests, frontend lint)
+- [x] Frontend i18n (zh-CN / zh-TW / en)
+- [x] Player stats & profile system (MongoDB)
+- [x] In-game hint system (3 view modes)
 - [ ] Integration test coverage for server game flow
 - [ ] `.env.example` for sensitive configuration
 
@@ -307,7 +379,6 @@ See [docs/api/server-api.md](docs/api/server-api.md) for the full WebSocket API 
 - [ ] User authentication / session persistence
 - [ ] Game replay viewer (frontend playback of `data/replays/`)
 - [ ] Agent decision dashboard -- reasoning logs and win-rate stats
-- [ ] Frontend i18n (internationalization)
 
 ### Long-term (P2)
 
