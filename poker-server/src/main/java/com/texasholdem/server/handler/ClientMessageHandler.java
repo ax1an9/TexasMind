@@ -7,19 +7,26 @@ import com.texasholdem.server.room.GameRoom;
 import com.texasholdem.server.room.RoomManager;
 import com.texasholdem.server.service.BroadcastService;
 import com.texasholdem.server.session.PlayerConnection;
+import com.texasholdem.server.stats.PlayerProfile;
+import com.texasholdem.server.stats.PlayerStatsService;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.stereotype.Controller;
 
 import java.security.Principal;
+import java.util.HashMap;
+import java.util.Map;
 
 @Controller
 public class ClientMessageHandler {
     private final RoomManager roomManager;
     private final BroadcastService broadcastService;
+    private final PlayerStatsService statsService;
 
-    public ClientMessageHandler(RoomManager roomManager, BroadcastService broadcastService) {
+    public ClientMessageHandler(RoomManager roomManager, BroadcastService broadcastService,
+                                PlayerStatsService statsService) {
         this.roomManager = roomManager;
         this.broadcastService = broadcastService;
+        this.statsService = statsService;
     }
 
     @MessageMapping("/lobby/rooms")
@@ -159,6 +166,74 @@ public class ClientMessageHandler {
             );
             broadcastService.sendToUser(userId, "/queue/hint-result", msg);
         }
+    }
+
+    @MessageMapping("/player/stats")
+    public void requestPlayerStats(PlayerStatsRequest request, Principal principal) {
+        String userId = principal.getName();
+        String targetId = request.getPlayerId() != null ? request.getPlayerId() : userId;
+        PlayerProfile profile = statsService.getProfile(targetId);
+        if (profile == null) {
+            broadcastService.sendToUser(userId, "/queue/error",
+                    new ErrorMessage("Player not found", "PLAYER_NOT_FOUND"));
+            return;
+        }
+
+        PlayerStatsMessage msg = new PlayerStatsMessage();
+        msg.setPlayerId(profile.getId());
+        msg.setDisplayName(profile.getDisplayName());
+        msg.setAllTimeHands(profile.getAllTime().getHandsPlayed());
+        msg.setRecentHands(profile.getRecent().getHandsPlayed());
+        msg.setSessionHands(profile.getCurrentSession().getHandsPlayed());
+
+        Map<String, Double> publicStats = new HashMap<>();
+        publicStats.put("vpip", profile.getAllTime().getVpip().getValue());
+        publicStats.put("pfr", profile.getAllTime().getPfr().getValue());
+        publicStats.put("handsPlayed", (double) profile.getAllTime().getHandsPlayed());
+        msg.setPublicStats(publicStats);
+
+        Map<String, Double> privateStats = new HashMap<>();
+        privateStats.put("threeBet", profile.getAllTime().getThreeBet().getValue());
+        privateStats.put("af", profile.getAllTime().getAf().getValue());
+        privateStats.put("wtsd", profile.getAllTime().getWtsd().getValue());
+        privateStats.put("wsd", profile.getAllTime().getWsd().getValue());
+        privateStats.put("foldToCbet", profile.getAllTime().getFoldToCbet().getValue());
+        msg.setPrivateStats(privateStats);
+
+        broadcastService.sendToUser(userId, "/queue/player-stats", msg);
+    }
+
+    @MessageMapping("/player/style")
+    public void requestPlayerStyle(PlayerStatsRequest request, Principal principal) {
+        String userId = principal.getName();
+        String targetId = request.getPlayerId() != null ? request.getPlayerId() : userId;
+        PlayerProfile profile = statsService.getProfile(targetId);
+        if (profile == null) return;
+
+        double vpip = profile.getAllTime().getVpip().getValue();
+        double pfr = profile.getAllTime().getPfr().getValue();
+
+        PlayerStyleMessage msg = new PlayerStyleMessage();
+        msg.setPlayerId(targetId);
+
+        String tightness = vpip < 0.14 ? "tight" : vpip < 0.23 ? "medium" : "loose";
+        double pfrVpipRatio = vpip > 0 ? pfr / vpip : 0;
+        String aggressiveness = pfrVpipRatio > 0.75 ? "aggressive" : "passive";
+
+        msg.setTightness(tightness);
+        msg.setAggressiveness(aggressiveness);
+        msg.setPrimaryStyle(classifyStyle(tightness, aggressiveness));
+        msg.setConfidence(Math.min(1.0, profile.getAllTime().getHandsPlayed() / 100.0));
+
+        broadcastService.sendToUser(userId, "/queue/player-style", msg);
+    }
+
+    private String classifyStyle(String tightness, String aggressiveness) {
+        if ("tight".equals(tightness) && "aggressive".equals(aggressiveness)) return "TAG";
+        if ("tight".equals(tightness) && "passive".equals(aggressiveness)) return "Rock";
+        if ("loose".equals(tightness) && "aggressive".equals(aggressiveness)) return "LAG";
+        if ("loose".equals(tightness) && "passive".equals(aggressiveness)) return "Calling Station";
+        return "Unknown";
     }
 
     private Action createAction(String playerId, String actionType, int amount) {
