@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useWebSocket } from './context/WebSocketContext';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
+import Profile from './pages/Profile';
 import styles from './App.module.css';
 
 export default function App() {
@@ -9,6 +10,7 @@ export default function App() {
   const [inputId, setInputId] = useState('');
   const [currentRoom, setCurrentRoom] = useState(null);
   const [initialRoomState, setInitialRoomState] = useState(null);
+  const [viewingProfile, setViewingProfile] = useState(null);
 
   if (!connected) {
     return (
@@ -31,6 +33,10 @@ export default function App() {
     );
   }
 
+  if (viewingProfile) {
+    return <Profile playerId={viewingProfile} onBack={() => setViewingProfile(null)} />;
+  }
+
   if (currentRoom) {
     return (
       <Game
@@ -46,8 +52,11 @@ export default function App() {
     );
   }
 
-  return <Lobby onJoinRoom={(roomId, roomName, roomData) => {
-    setCurrentRoom({ roomId, roomName });
-    setInitialRoomState(roomData || null);
-  }} />;
+  return <Lobby
+    onJoinRoom={(roomId, roomName, roomData) => {
+      setCurrentRoom({ roomId, roomName });
+      setInitialRoomState(roomData || null);
+    }}
+    onOpenProfile={(playerId) => setViewingProfile(playerId)}
+  />;
 }

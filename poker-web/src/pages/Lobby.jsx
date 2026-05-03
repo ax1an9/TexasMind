@@ -3,7 +3,7 @@ import { useWebSocket } from '../context/WebSocketContext';
 import CreateRoomModal from '../components/CreateRoomModal';
 import styles from './Lobby.module.css';
 
-export default function Lobby({ onJoinRoom }) {
+export default function Lobby({ onJoinRoom, onOpenProfile }) {
   const { send, subscribe, connected, userId } = useWebSocket();
   const [rooms, setRooms] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
@@ -41,7 +41,7 @@ export default function Lobby({ onJoinRoom }) {
     <div className={styles.lobby}>
       <header className={styles.header}>
         <h1 className={styles.title}>Texas Hold'em</h1>
-        <div className={styles.user}>
+        <div className={styles.user} onClick={() => onOpenProfile && onOpenProfile(userId)} style={{ cursor: 'pointer' }}>
           <span className={styles.dot} />
           {userId}
         </div>
