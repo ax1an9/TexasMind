@@ -1,0 +1,84 @@
+.profile {
+  min-height: 100vh;
+  background: #0f1923;
+  color: #ecf0f1;
+  padding: 20px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.backBtn {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #ecf0f1;
+  padding: 8px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+.backBtn:hover { background: rgba(255, 255, 255, 0.1); }
+
+.playerName { font-size: 24px; font-weight: 600; }
+
+.styleCard {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.styleName { font-size: 32px; font-weight: 700; color: #f0c040; margin: 8px 0; }
+.styleDesc { color: rgba(255, 255, 255, 0.6); font-size: 14px; }
+
+.statsGrid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.statCard {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 16px;
+  text-align: center;
+}
+
+.statLabel { font-size: 12px; color: rgba(255, 255, 255, 0.5); margin-bottom: 4px; }
+.statValue { font-size: 24px; font-weight: 600; color: #ecf0f1; }
+.statValue.good { color: #2ecc71; }
+.statValue.avg { color: #f0c040; }
+.statValue.bad { color: #e74c3c; }
+
+.windowTabs { display: flex; gap: 8px; margin-bottom: 16px; }
+
+.tab {
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.tab.active {
+  background: rgba(240, 192, 64, 0.2);
+  border-color: #f0c040;
+  color: #f0c040;
+}
+
+.empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 40px;
+}
