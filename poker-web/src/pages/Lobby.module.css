@@ -26,6 +26,12 @@
   color: #bdc3c7;
 }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .dot {
   width: 8px;
   height: 8px;

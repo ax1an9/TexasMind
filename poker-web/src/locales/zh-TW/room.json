@@ -1,0 +1,9 @@
+{
+  "createRoom": "創建房間",
+  "roomName": "房間名稱",
+  "roomNamePlaceholder": "輸入房間名稱",
+  "maxPlayers": "最大玩家",
+  "smallBlind": "小盲",
+  "bigBlind": "大盲",
+  "startingChips": "初始籌碼"
+}

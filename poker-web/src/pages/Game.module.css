@@ -38,6 +38,12 @@
 
 .leaveBtn:hover { background: rgba(231, 76, 60, 0.1); }
 
+.headerRight {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
 .table {
   flex: 1;
   display: flex;

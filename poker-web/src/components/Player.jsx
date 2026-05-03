@@ -1,13 +1,16 @@
+import { useTranslation } from 'react-i18next';
 import Card from './Card';
 import PlayerHUD from './PlayerHUD';
 import styles from './Player.module.css';
 
 export default function Player({ player, isCurrentPlayer, isSelf, showCards }) {
+  const { t } = useTranslation(['common']);
+
   if (!player) return <div className={styles.empty} />;
 
-  const stateLabel = player.folded ? '已弃牌'
-    : player.allIn ? 'ALL IN'
-    : isCurrentPlayer ? '思考中...'
+  const stateLabel = player.folded ? t('common:folded')
+    : player.allIn ? t('common:allInStatus')
+    : isCurrentPlayer ? t('common:thinking')
     : '';
 
   return (
@@ -36,7 +39,7 @@ export default function Player({ player, isCurrentPlayer, isSelf, showCards }) {
         )}
       </div>
       {player.roundContribution > 0 && (
-        <div className={styles.bet}>下注: ${player.roundContribution}</div>
+        <div className={styles.bet}>{t('common:bet')}: ${player.roundContribution}</div>
       )}
       {player.handRankDisplay && (
         <div className={styles.handRank}>{player.handRankDisplay}</div>

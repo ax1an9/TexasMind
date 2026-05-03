@@ -1,12 +1,15 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWebSocket } from '../context/WebSocketContext';
 import Board from '../components/Board';
 import Player from '../components/Player';
 import ActionBar from '../components/ActionBar';
 import HintPanel from '../components/HintPanel';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import styles from './Game.module.css';
 
 export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
+  const { t } = useTranslation(['game', 'common']);
   const { send, subscribe, userId } = useWebSocket();
   const [gameState, setGameState] = useState(null);
   const [gameResult, setGameResult] = useState(null);
@@ -54,13 +57,11 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
       }
     });
 
-    // User-specific room state (sent on join/create to avoid race condition)
     const unsub5 = subscribe('/user/queue/room-state', (msg) => {
       const data = JSON.parse(msg.body);
       setRoomState(data);
     });
 
-    // Request room state on mount if not already available
     send('/app/room/state', { roomId });
 
     return () => { unsub1(); unsub2(); unsub3(); unsub4(); unsub5(); };
@@ -113,7 +114,9 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
     const secs = Math.floor(ms / 1000);
     const mins = Math.floor(secs / 60);
     const remainSecs = secs % 60;
-    return mins > 0 ? `${mins}分${remainSecs}秒` : `${remainSecs}秒`;
+    return mins > 0
+      ? t('game:durationFormat', { min: mins, sec: remainSecs })
+      : t('game:durationSec', { sec: remainSecs });
   };
 
   const showWaitingRoom = !inGame && roomState;
@@ -121,34 +124,36 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
   return (
     <div className={styles.game}>
       <header className={styles.header}>
-        <span className={styles.roomName}>房间: {roomState?.roomName || roomName || roomId}</span>
+        <span className={styles.roomName}>{t('common:room')}: {roomState?.roomName || roomName || roomId}</span>
         {inGame && <span className={styles.phase}>{gameState?.phase}</span>}
-        <button className={styles.leaveBtn} onClick={onLeave}>离开房间</button>
+        <div className={styles.headerRight}>
+          <LanguageSwitcher />
+          <button className={styles.leaveBtn} onClick={onLeave}>{t('game:leaveRoom')}</button>
+        </div>
       </header>
 
       {showWaitingRoom ? (
         <div className={styles.waitingRoom}>
-          {/* Session Summary (shown inline if available) */}
           {sessionSummary && (
             <div className={styles.inlineSummary}>
-              <h3 className={styles.inlineSummaryTitle}>上局总结</h3>
+              <h3 className={styles.inlineSummaryTitle}>{t('game:lastSummary')}</h3>
               <div className={styles.inlineSummaryMeta}>
-                <span>总局数: {sessionSummary.totalHands}</span>
-                <span>时长: {formatDuration(sessionSummary.durationMs)}</span>
+                <span>{t('game:totalHands')}: {sessionSummary.totalHands}</span>
+                <span>{t('game:duration')}: {formatDuration(sessionSummary.durationMs)}</span>
               </div>
               <div className={styles.inlineSummaryTable}>
                 <div className={styles.inlineSummaryHeader}>
-                  <span>玩家</span>
-                  <span>起始</span>
-                  <span>最终</span>
-                  <span>净盈亏</span>
+                  <span>{t('game:playerHeader')}</span>
+                  <span>{t('game:startingChips')}</span>
+                  <span>{t('game:finalChips')}</span>
+                  <span>{t('game:netProfit')}</span>
                 </div>
                 {sessionSummary.players
                   .sort((a, b) => b.finalChips - a.finalChips)
                   .map(p => (
                   <div key={p.seatId} className={`${styles.inlineSummaryRow} ${p.busted ? styles.bustedRow : ''}`}>
                     <span className={styles.summaryName}>
-                      {p.seatId}{p.seatId === userId && ' (你)'}{p.busted && ' 💀'}
+                      {p.seatId}{p.seatId === userId && t('game:youSuffix')}{p.busted && ' 💀'}
                     </span>
                     <span>{p.startingChips}</span>
                     <span>{p.finalChips}</span>
@@ -161,41 +166,39 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
             </div>
           )}
 
-          {/* Player List */}
           <div className={styles.playerList}>
             <h3 className={styles.playerListTitle}>
-              玩家 ({roomState.players.length}/{roomState.maxPlayers})
+              {t('game:playerCount', { current: roomState.players.length, max: roomState.maxPlayers })}
             </h3>
             {roomState.players.map(p => (
               <div key={p.seatId} className={styles.playerSlot}>
                 <span className={styles.slotName}>
                   {p.seatId}
-                  {p.host && <span className={styles.hostBadge}>房主</span>}
+                  {p.host && <span className={styles.hostBadge}>{t('common:host')}</span>}
                   {p.ai && <span className={p.agentType === 'react' ? styles.aiBadgeReact : styles.aiBadgeSimple}>
                     {p.agentType === 'react' ? 'ReAct' : 'Simple'}
                   </span>}
-                  {p.seatId === userId && ' (你)'}
+                  {p.seatId === userId && t('game:youSuffix')}
                 </span>
                 <span className={`${styles.readyStatus} ${p.ready ? styles.ready : styles.notReady}`}>
-                  {p.ready ? '已准备' : '未准备'}
+                  {p.ready ? t('common:ready') : t('common:notReady')}
                 </span>
                 {isHost && p.ai && (
                   <button className={styles.removeBotBtn} onClick={() => handleRemoveBot(p.seatId)}>
-                    移除
+                    {t('common:remove')}
                   </button>
                 )}
               </div>
             ))}
           </div>
 
-          {/* Actions */}
           <div className={styles.waitingActions}>
             {!isHost && (
               <button
                 className={myReady ? styles.unreadyBtn : styles.readyBtn}
                 onClick={handleReady}
               >
-                {myReady ? '取消准备' : '准备'}
+                {myReady ? t('game:unready') : t('game:readyBtn')}
               </button>
             )}
             {isHost && (
@@ -205,29 +208,29 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
                   onClick={() => handleAddBot('simple')}
                   disabled={roomState.players.length >= roomState.maxPlayers}
                 >
-                  + Simple AI
+                  {t('game:addSimpleAI')}
                 </button>
                 <button
                   className={styles.addBotBtnReact}
                   onClick={() => handleAddBot('react')}
                   disabled={roomState.players.length >= roomState.maxPlayers}
                 >
-                  + ReAct Agent
+                  {t('game:addReActAgent')}
                 </button>
                 <button
                   className={styles.startBtn}
                   onClick={handleStartGame}
                   disabled={!canStart}
                 >
-                  {sessionSummary ? '开始新一局' : '开始游戏'}
+                  {sessionSummary ? t('game:startNewSession') : t('game:startGame')}
                 </button>
               </>
             )}
             {isHost && !canStart && roomState.players.length < 2 && (
-              <div className={styles.waitingHint}>请添加AI或等待其他玩家加入</div>
+              <div className={styles.waitingHint}>{t('game:addBotHint')}</div>
             )}
             {isHost && !canStart && roomState.players.length >= 2 && (
-              <div className={styles.waitingHint}>等待所有玩家准备</div>
+              <div className={styles.waitingHint}>{t('game:waitingReady')}</div>
             )}
           </div>
         </div>
@@ -260,14 +263,16 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
             {gameResult && (
               <div className={styles.resultBanner}>
                 <span className={styles.resultTitle}>
-                  {gameResult.winnerSeatId === userId ? '你赢了!' : `${gameResult.winnerSeatId} 赢了`}
+                  {gameResult.winnerSeatId === userId
+                    ? t('game:youWon')
+                    : t('game:playerWon', { name: gameResult.winnerSeatId })}
                 </span>
                 {gameResult.chipChanges && (() => {
                   const winnerGain = gameResult.chipChanges[gameResult.winnerSeatId];
                   return (
                     <>
                       <span className={styles.resultPot}>
-                        赢得 ${winnerGain >= 0 ? winnerGain : gameResult.potAmount}
+                        {t('game:wonPot', { amount: winnerGain >= 0 ? winnerGain : gameResult.potAmount })}
                       </span>
                       <span className={styles.chipChanges}>
                         {Object.entries(gameResult.chipChanges).map(([id, change]) => (
@@ -287,10 +292,10 @@ export default function Game({ roomId, roomName, initialRoomState, onLeave }) {
             {isSettled ? (
               <div className={styles.waitingArea}>
                 <div className={styles.waitingInfo}>
-                  {isHost ? '点击"开始下一局"' : '等待房主开始下一局'}
+                  {isHost ? t('game:hostStartHint') : t('game:waitingHostAction')}
                 </div>
                 {isHost && (
-                  <button className={styles.startBtn} onClick={handleStartGame}>开始下一局</button>
+                  <button className={styles.startBtn} onClick={handleStartGame}>{t('game:startNext')}</button>
                 )}
               </div>
             ) : (

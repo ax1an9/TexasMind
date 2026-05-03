@@ -1,11 +1,14 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWebSocket } from './context/WebSocketContext';
 import Lobby from './pages/Lobby';
 import Game from './pages/Game';
 import Profile from './pages/Profile';
+import LanguageSwitcher from './components/LanguageSwitcher';
 import styles from './App.module.css';
 
 export default function App() {
+  const { t } = useTranslation(['common']);
   const { connected, connect, send, userId } = useWebSocket();
   const [inputId, setInputId] = useState('');
   const [currentRoom, setCurrentRoom] = useState(null);
@@ -17,17 +20,18 @@ export default function App() {
       <div className={styles.login}>
         <div className={styles.loginCard}>
           <h1 className={styles.loginTitle}>Texas Hold'em</h1>
-          <p className={styles.loginSub}>输入昵称加入游戏</p>
+          <p className={styles.loginSub}>{t('common:loginSubtitle')}</p>
           <form onSubmit={(e) => { e.preventDefault(); if (inputId.trim()) connect(inputId.trim()); }}>
             <input
               className={styles.loginInput}
               value={inputId}
               onChange={e => setInputId(e.target.value)}
-              placeholder="你的昵称"
+              placeholder={t('common:nicknamePlaceholder')}
               autoFocus
             />
-            <button type="submit" className={styles.loginBtn}>连接</button>
+            <button type="submit" className={styles.loginBtn}>{t('common:connect')}</button>
           </form>
+          <div className={styles.langRow}><LanguageSwitcher /></div>
         </div>
       </div>
     );

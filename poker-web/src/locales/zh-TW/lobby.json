@@ -1,0 +1,11 @@
+{
+  "roomList": "房間列表",
+  "createRoom": "+ 創建房間",
+  "noRooms": "暫無房間，創建一個吧",
+  "players": "玩家",
+  "statusWaiting": "等待中",
+  "statusPlaying": "遊戲中",
+  "statusEnded": "已結束",
+  "statusClosed": "已關閉",
+  "join": "加入"
+}

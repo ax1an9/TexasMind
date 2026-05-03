@@ -1,9 +1,12 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useWebSocket } from '../context/WebSocketContext';
 import CreateRoomModal from '../components/CreateRoomModal';
+import LanguageSwitcher from '../components/LanguageSwitcher';
 import styles from './Lobby.module.css';
 
 export default function Lobby({ onJoinRoom, onOpenProfile }) {
+  const { t } = useTranslation(['lobby', 'common']);
   const { send, subscribe, connected, userId } = useWebSocket();
   const [rooms, setRooms] = useState([]);
   const [showCreate, setShowCreate] = useState(false);
@@ -22,7 +25,6 @@ export default function Lobby({ onJoinRoom, onOpenProfile }) {
       const data = JSON.parse(msg.body);
       if (data.rooms) setRooms(data.rooms);
     });
-    // Request current room list on mount
     send('/app/lobby/rooms', {});
     return () => { unsub1(); unsub2(); unsub3(); };
   }, [connected, subscribe, onJoinRoom, send]);
@@ -37,26 +39,35 @@ export default function Lobby({ onJoinRoom, onOpenProfile }) {
     onJoinRoom(roomId, roomName || roomId);
   };
 
+  const statusMap = {
+    WAITING: t('lobby:statusWaiting'),
+    PLAYING: t('lobby:statusPlaying'),
+    GAME_OVER: t('lobby:statusEnded'),
+  };
+
   return (
     <div className={styles.lobby}>
       <header className={styles.header}>
         <h1 className={styles.title}>Texas Hold'em</h1>
-        <div className={styles.user} onClick={() => onOpenProfile && onOpenProfile(userId)} style={{ cursor: 'pointer' }}>
-          <span className={styles.dot} />
-          {userId}
+        <div className={styles.headerRight}>
+          <LanguageSwitcher />
+          <div className={styles.user} onClick={() => onOpenProfile && onOpenProfile(userId)} style={{ cursor: 'pointer' }}>
+            <span className={styles.dot} />
+            {userId}
+          </div>
         </div>
       </header>
 
       <div className={styles.content}>
         <div className={styles.sectionHeader}>
-          <h2 className={styles.sectionTitle}>房间列表</h2>
+          <h2 className={styles.sectionTitle}>{t('lobby:roomList')}</h2>
           <button className={styles.createBtn} onClick={() => setShowCreate(true)}>
-            + 创建房间
+            {t('lobby:createRoom')}
           </button>
         </div>
 
         {rooms.length === 0 ? (
-          <div className={styles.empty}>暂无房间，创建一个吧</div>
+          <div className={styles.empty}>{t('lobby:noRooms')}</div>
         ) : (
           <div className={styles.roomList}>
             {rooms.map(room => (
@@ -64,10 +75,10 @@ export default function Lobby({ onJoinRoom, onOpenProfile }) {
                 <div className={styles.roomInfo}>
                   <span className={styles.roomName}>{room.name}</span>
                   <span className={styles.roomMeta}>
-                    {room.currentPlayers}/{room.maxPlayers} 玩家
+                    {room.currentPlayers}/{room.maxPlayers} {t('lobby:players')}
                   </span>
                   <span className={`${styles.status} ${styles[room.status.toLowerCase()]}`}>
-                    {room.status === 'WAITING' ? '等待中' : room.status === 'PLAYING' ? '游戏中' : room.status === 'GAME_OVER' ? '已结束' : '已关闭'}
+                    {statusMap[room.status] || t('lobby:statusClosed')}
                   </span>
                 </div>
                 <button
@@ -75,7 +86,7 @@ export default function Lobby({ onJoinRoom, onOpenProfile }) {
                   onClick={() => handleJoin(room.roomId, room.name)}
                   disabled={room.status !== 'WAITING' || room.currentPlayers >= room.maxPlayers}
                 >
-                  加入
+                  {t('lobby:join')}
                 </button>
               </div>
             ))}

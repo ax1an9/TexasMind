@@ -1,0 +1,9 @@
+{
+  "createRoom": "Create Room",
+  "roomName": "Room Name",
+  "roomNamePlaceholder": "Enter room name",
+  "maxPlayers": "Max Players",
+  "smallBlind": "Small Blind",
+  "bigBlind": "Big Blind",
+  "startingChips": "Starting Chips"
+}

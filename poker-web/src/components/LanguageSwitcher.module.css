@@ -1,0 +1,30 @@
+.toggle {
+  display: flex;
+  border-radius: 6px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.btn {
+  padding: 4px 10px;
+  border: none;
+  background: rgba(0, 0, 0, 0.3);
+  color: #95a5a6;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.btn:not(:last-child) {
+  border-right: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn:hover {
+  color: #ecf0f1;
+}
+
+.active {
+  background: rgba(52, 152, 219, 0.3);
+  color: #3498db;
+  font-weight: 600;
+}

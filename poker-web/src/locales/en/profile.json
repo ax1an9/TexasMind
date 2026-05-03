@@ -1,0 +1,14 @@
+{
+  "noData": "No data yet",
+  "totalHands": "Total Hands",
+  "timeAll": "All Time",
+  "timeRecent": "Recent 500",
+  "timeSession": "Session",
+  "insufficientData": "Insufficient data",
+  "styleRock": "Tight-passive, plays only good hands but bets conservatively",
+  "styleTAG": "Tight-aggressive, selects premium hands and bets actively",
+  "styleMediumPassive": "Medium frequency, tends to call",
+  "styleMediumAggressive": "Medium frequency, bets actively",
+  "styleLoosePassive": "Loose-passive, plays many hands but rarely raises",
+  "styleLooseAggressive": "Loose-aggressive, bets frequently to apply pressure"
+}

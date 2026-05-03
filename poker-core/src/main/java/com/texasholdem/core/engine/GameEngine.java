@@ -103,6 +103,7 @@ public final class GameEngine {
 
         List<PlayerState> players = new ArrayList<PlayerState>(state.getPlayers());
         List<Action> history = new ArrayList<Action>(state.getActionHistory());
+        action.setPhase(state.getPhase());
         history.add(action);
 
         int currentBet = state.getCurrentBet();

@@ -1,0 +1,20 @@
+{
+  "getHint": "Get Hint",
+  "modeSimple": "Simple",
+  "modeStandard": "Standard",
+  "modeDetailed": "Detailed",
+  "handStrength": "Strength",
+  "potOdds": "Pot Odds",
+  "strengthAnalysis": "Strength Analysis",
+  "totalStrength": "Total",
+  "oddsLabel": "Pot Odds: ",
+  "oddsFavorable": " — Strength above odds, call is profitable",
+  "oddsRisky": " — Strength below odds, proceed with caution",
+  "baseStrength": "Base Strength",
+  "pairBonus": "Pair Bonus",
+  "suitedBonus": "Suited Bonus",
+  "connectorBonus": "Connector Bonus",
+  "gapperBonus": "One-Gap Bonus",
+  "highCardBonus": "High Card Bonus",
+  "handRankEval": "Hand Rank"
+}

@@ -1,0 +1,20 @@
+{
+  "getHint": "获取提示",
+  "modeSimple": "简洁",
+  "modeStandard": "标准",
+  "modeDetailed": "详细",
+  "handStrength": "手牌强度",
+  "potOdds": "底池赔率",
+  "strengthAnalysis": "手牌强度分析",
+  "totalStrength": "总强度",
+  "oddsLabel": "底池赔率: ",
+  "oddsFavorable": " — 强度高于赔率，跟注有利",
+  "oddsRisky": " — 强度低于赔率，需谨慎",
+  "baseStrength": "基础牌力",
+  "pairBonus": "对子加成",
+  "suitedBonus": "同花加成",
+  "connectorBonus": "连牌加成",
+  "gapperBonus": "邻牌加成",
+  "highCardBonus": "高牌加成",
+  "handRankEval": "牌型评估"
+}

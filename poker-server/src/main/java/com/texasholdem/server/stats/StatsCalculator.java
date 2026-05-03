@@ -92,21 +92,17 @@ public class StatsCalculator {
     }
 
     private static void analyzeFoldToCbet(List<Action> actions, String playerId, HandStatsUpdate update) {
-        boolean preflopPhase = true;
         String preflopRaiser = null;
 
-        for (int i = 0; i < actions.size(); i++) {
-            Action a = actions.get(i);
-            if (preflopPhase) {
+        for (Action a : actions) {
+            GamePhase phase = a.getPhase();
+            if (phase == null) continue;
+
+            if (phase == GamePhase.PRE_FLOP) {
                 if (a.getType() == ActionType.RAISE || a.getType() == ActionType.BET) {
                     preflopRaiser = a.getPlayerId();
                 }
-                if (i > 0 && a.getPlayerId().equals(actions.get(0).getPlayerId())
-                        && !a.getPlayerId().equals(actions.get(i - 1).getPlayerId())) {
-                    preflopPhase = false;
-                }
-            }
-            if (!preflopPhase && preflopRaiser != null && !preflopRaiser.equals(playerId)) {
+            } else if (preflopRaiser != null && !preflopRaiser.equals(playerId)) {
                 if ((a.getType() == ActionType.BET || a.getType() == ActionType.RAISE)
                         && a.getPlayerId().equals(preflopRaiser)) {
                     update.setFacesCbet(true);

@@ -1,11 +1,13 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './ActionBar.module.css';
 
 export default function ActionBar({ gameState, onAction, disabled }) {
+  const { t } = useTranslation(['common']);
   const [raiseAmount, setRaiseAmount] = useState(0);
 
   if (!gameState || disabled) {
-    return <div className={styles.bar}><span className={styles.waiting}>等待其他玩家...</span></div>;
+    return <div className={styles.bar}><span className={styles.waiting}>{t('game:waitingPlayers')}</span></div>;
   }
 
   const currentBet = gameState.currentBet || 0;
@@ -22,15 +24,15 @@ export default function ActionBar({ gameState, onAction, disabled }) {
   return (
     <div className={styles.bar}>
       <button className={`${styles.btn} ${styles.fold}`} onClick={() => onAction('FOLD', 0)}>
-        弃牌
+        {t('common:fold')}
       </button>
       {canCheck ? (
         <button className={`${styles.btn} ${styles.check}`} onClick={() => onAction('CHECK', 0)}>
-          过牌
+          {t('common:check')}
         </button>
       ) : (
         <button className={`${styles.btn} ${styles.call}`} onClick={() => onAction('CALL', 0)}>
-          跟注 ${toCall}
+          {t('common:call')} ${toCall}
         </button>
       )}
       <div className={styles.raiseGroup}>
@@ -51,11 +53,11 @@ export default function ActionBar({ gameState, onAction, disabled }) {
           className={styles.amountInput}
         />
         <button className={`${styles.btn} ${styles.raise}`} onClick={handleRaise}>
-          加注
+          {t('common:raise')}
         </button>
       </div>
       <button className={`${styles.btn} ${styles.allin}`} onClick={() => onAction('ALL_IN', 0)}>
-        全下
+        {t('common:allIn')}
       </button>
     </div>
   );

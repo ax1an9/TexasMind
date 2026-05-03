@@ -1,10 +1,9 @@
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './HintPanel.module.css';
 
 const VIEW_MODE_KEY = 'poker-hint-view-mode';
 const MODES = ['simple', 'standard', 'detailed'];
-const MODE_LABELS = { simple: '简洁', standard: '标准', detailed: '详细' };
-const ACTION_LABELS = { FOLD: '弃牌', CHECK: '过牌', CALL: '跟注', RAISE: '加注' };
 const ACTION_ICONS = { FOLD: '✕', CHECK: '✓', CALL: '$', RAISE: '↑' };
 const ACTION_ICON_STYLES = {
   FOLD: styles.iconFold,
@@ -12,6 +11,9 @@ const ACTION_ICON_STYLES = {
   CALL: styles.iconCall,
   RAISE: styles.iconRaise,
 };
+
+const ACTION_KEYS = { FOLD: 'fold', CHECK: 'check', CALL: 'call', RAISE: 'raise' };
+const MODE_KEYS = { simple: 'modeSimple', standard: 'modeStandard', detailed: 'modeDetailed' };
 
 function getInitialMode() {
   try {
@@ -22,6 +24,7 @@ function getInitialMode() {
 }
 
 export default function HintPanel({ hint, onRequestHint, canRequest }) {
+  const { t } = useTranslation(['hint', 'common']);
   const [viewMode, setViewMode] = useState(getInitialMode);
 
   useEffect(() => {
@@ -35,7 +38,7 @@ export default function HintPanel({ hint, onRequestHint, canRequest }) {
         onClick={onRequestHint}
         disabled={!canRequest}
       >
-        获取提示
+        {t('hint:getHint')}
       </button>
 
       {hint && (
@@ -46,7 +49,7 @@ export default function HintPanel({ hint, onRequestHint, canRequest }) {
               className={`${styles.modeBtn} ${viewMode === m ? styles.modeBtnActive : ''}`}
               onClick={() => setViewMode(m)}
             >
-              {MODE_LABELS[m]}
+              {t(`hint:${MODE_KEYS[m]}`)}
             </button>
           ))}
         </div>
@@ -54,29 +57,29 @@ export default function HintPanel({ hint, onRequestHint, canRequest }) {
 
       {hint && (
         <div className={styles.content}>
-          {viewMode === 'simple' && <SimpleView hint={hint} />}
-          {viewMode === 'standard' && <StandardView hint={hint} />}
-          {viewMode === 'detailed' && <DetailedView hint={hint} />}
+          {viewMode === 'simple' && <SimpleView hint={hint} t={t} />}
+          {viewMode === 'standard' && <StandardView hint={hint} t={t} />}
+          {viewMode === 'detailed' && <DetailedView hint={hint} t={t} />}
         </div>
       )}
     </div>
   );
 }
 
-function SimpleView({ hint }) {
+function SimpleView({ hint, t }) {
   const action = hint.suggestedAction;
   return (
     <div className={styles.simpleView}>
       <div className={`${styles.actionIcon} ${ACTION_ICON_STYLES[action] || ''}`}>
         {ACTION_ICONS[action] || '?'}
       </div>
-      <span className={styles.actionLabel}>{ACTION_LABELS[action] || action}</span>
+      <span className={styles.actionLabel}>{t(`common:${ACTION_KEYS[action]}`, action)}</span>
       <span className={styles.simpleReasoning}>{hint.simpleReasoning}</span>
     </div>
   );
 }
 
-function StandardView({ hint }) {
+function StandardView({ hint, t }) {
   const action = hint.suggestedAction;
   const strengthPct = Math.round(hint.handStrength * 100);
   const oddsPct = Math.round(hint.potOdds * 100);
@@ -84,11 +87,11 @@ function StandardView({ hint }) {
   return (
     <div className={styles.standardView}>
       <div className={styles.actionRow}>
-        <span className={styles.actionLabel}>{ACTION_LABELS[action] || action}</span>
+        <span className={styles.actionLabel}>{t(`common:${ACTION_KEYS[action]}`, action)}</span>
       </div>
       <div className={styles.barGroup}>
         <div className={styles.barRow}>
-          <span className={styles.barLabel}>手牌强度</span>
+          <span className={styles.barLabel}>{t('hint:handStrength')}</span>
           <div className={styles.barTrack}>
             <div
               className={`${styles.barFill} ${styles.barStrength}`}
@@ -99,7 +102,7 @@ function StandardView({ hint }) {
         </div>
         {hint.potOdds > 0 && (
           <div className={styles.barRow}>
-            <span className={styles.barLabel}>底池赔率</span>
+            <span className={styles.barLabel}>{t('hint:potOdds')}</span>
             <div className={styles.barTrack}>
               <div
                 className={`${styles.barFill} ${styles.barOdds}`}
@@ -115,22 +118,21 @@ function StandardView({ hint }) {
   );
 }
 
-function DetailedView({ hint }) {
+function DetailedView({ hint, t }) {
   const action = hint.suggestedAction;
   const factors = hint.strengthFactors || [];
-  const totalStrength = factors.reduce((sum, f) => sum + f.value, 0);
   const strengthPct = Math.round(hint.handStrength * 100);
 
   return (
     <div className={styles.detailedView}>
       <div className={styles.detailHeader}>
-        <span className={styles.actionLabel}>{ACTION_LABELS[action] || action}</span>
+        <span className={styles.actionLabel}>{t(`common:${ACTION_KEYS[action]}`, action)}</span>
         {hint.handRankName && <span className={styles.handRank}>{hint.handRankName}</span>}
       </div>
 
       {factors.length > 0 && (
         <div className={styles.factorSection}>
-          <div className={styles.factorTitle}>手牌强度分析</div>
+          <div className={styles.factorTitle}>{t('hint:strengthAnalysis')}</div>
           {factors.map((f, i) => (
             <div key={i} className={styles.factorRow}>
               <span>
@@ -141,7 +143,7 @@ function DetailedView({ hint }) {
             </div>
           ))}
           <div className={styles.factorTotal}>
-            <span className={styles.factorLabel}>总强度</span>
+            <span className={styles.factorLabel}>{t('hint:totalStrength')}</span>
             <span className={styles.factorValue}>{strengthPct}%</span>
           </div>
         </div>
@@ -149,12 +151,12 @@ function DetailedView({ hint }) {
 
       {hint.potOdds > 0 && (
         <div className={styles.oddsMath}>
-          底池赔率: <span className={styles.oddsFormula}>
+          {t('hint:oddsLabel')}<span className={styles.oddsFormula}>
             {hint.toCall} / ({hint.totalPot} + {hint.toCall}) = {Math.round(hint.potOdds * 100)}%
           </span>
           {hint.handStrength >= hint.potOdds
-            ? ' — 强度高于赔率，跟注有利'
-            : ' — 强度低于赔率，需谨慎'}
+            ? t('hint:oddsFavorable')
+            : t('hint:oddsRisky')}
         </div>
       )}
 

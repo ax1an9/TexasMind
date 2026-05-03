@@ -1,8 +1,10 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePlayerStats } from '../hooks/usePlayerStats';
 import styles from './PlayerHUD.module.css';
 
 export default function PlayerHUD({ playerId, isSelf }) {
+  const { t } = useTranslation(['common']);
   const { stats } = usePlayerStats(playerId);
   const [expanded, setExpanded] = useState(false);
 
@@ -21,12 +23,12 @@ export default function PlayerHUD({ playerId, isSelf }) {
         <span className={styles.label}>PFR</span>
         <span className={styles.value}>{(pub.pfr * 100).toFixed(0)}%</span>
       </div>
-      <div className={styles.hands}>{stats.allTimeHands} 手</div>
+      <div className={styles.hands}>{stats.allTimeHands} {t('common:hands')}</div>
 
       {isSelf && priv && (
         <>
           <button className={styles.expandBtn} onClick={() => setExpanded(!expanded)}>
-            {expanded ? '收起 ▲' : '详细 ▼'}
+            {expanded ? t('common:collapse') : t('common:expand')}
           </button>
           {expanded && (
             <div className={styles.privateStats}>

@@ -1,0 +1,14 @@
+{
+  "noData": "暂无数据",
+  "totalHands": "总手数",
+  "timeAll": "全部",
+  "timeRecent": "近500手",
+  "timeSession": "本场",
+  "insufficientData": "数据不足",
+  "styleRock": "紧而被动，只玩好牌但下注保守",
+  "styleTAG": "紧而激进，精选好牌积极下注",
+  "styleMediumPassive": "中等频率，倾向于跟注",
+  "styleMediumAggressive": "中等频率，积极下注",
+  "styleLoosePassive": "松而被动，玩很多牌但很少加注",
+  "styleLooseAggressive": "松而激进，频繁下注施压"
+}

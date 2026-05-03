@@ -1,7 +1,9 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import styles from './CreateRoomModal.module.css';
 
 export default function CreateRoomModal({ onClose, onSubmit }) {
+  const { t } = useTranslation(['room', 'common']);
   const [form, setForm] = useState({
     roomName: '',
     maxPlayers: 6,
@@ -20,38 +22,38 @@ export default function CreateRoomModal({ onClose, onSubmit }) {
   return (
     <div className={styles.overlay} onClick={onClose}>
       <div className={styles.modal} onClick={e => e.stopPropagation()}>
-        <h2 className={styles.title}>创建房间</h2>
+        <h2 className={styles.title}>{t('room:createRoom')}</h2>
         <form onSubmit={handleSubmit} className={styles.form}>
           <label className={styles.label}>
-            房间名称
+            {t('room:roomName')}
             <input value={form.roomName} onChange={e => update('roomName', e.target.value)}
-              className={styles.input} required placeholder="输入房间名称" />
+              className={styles.input} required placeholder={t('room:roomNamePlaceholder')} />
           </label>
           <div className={styles.row}>
             <label className={styles.label}>
-              最大玩家
+              {t('room:maxPlayers')}
               <input type="number" min={2} max={9} value={form.maxPlayers}
                 onChange={e => update('maxPlayers', Number(e.target.value))} className={styles.input} />
             </label>
             <label className={styles.label}>
-              小盲
+              {t('room:smallBlind')}
               <input type="number" min={1} value={form.smallBlind}
                 onChange={e => update('smallBlind', Number(e.target.value))} className={styles.input} />
             </label>
             <label className={styles.label}>
-              大盲
+              {t('room:bigBlind')}
               <input type="number" min={1} value={form.bigBlind}
                 onChange={e => update('bigBlind', Number(e.target.value))} className={styles.input} />
             </label>
           </div>
           <label className={styles.label}>
-            初始筹码
+            {t('room:startingChips')}
             <input type="number" min={100} value={form.startingChips}
               onChange={e => update('startingChips', Number(e.target.value))} className={styles.input} />
           </label>
           <div className={styles.actions}>
-            <button type="button" onClick={onClose} className={styles.cancel}>取消</button>
-            <button type="submit" className={styles.submit}>创建</button>
+            <button type="button" onClick={onClose} className={styles.cancel}>{t('common:cancel')}</button>
+            <button type="submit" className={styles.submit}>{t('common:confirm')}</button>
           </div>
         </form>
       </div>

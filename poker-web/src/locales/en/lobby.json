@@ -1,0 +1,11 @@
+{
+  "roomList": "Room List",
+  "createRoom": "+ Create Room",
+  "noRooms": "No rooms yet, create one!",
+  "players": "Players",
+  "statusWaiting": "Waiting",
+  "statusPlaying": "Playing",
+  "statusEnded": "Ended",
+  "statusClosed": "Closed",
+  "join": "Join"
+}

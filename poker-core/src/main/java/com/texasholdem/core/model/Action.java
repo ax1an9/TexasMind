@@ -6,6 +6,7 @@ public abstract class Action {
     private final String playerId;
     private final ActionType type;
     private final int amount;
+    private GamePhase phase;
 
     protected Action(String playerId, ActionType type, int amount) {
         this.playerId = Objects.requireNonNull(playerId, "playerId");
@@ -23,5 +24,13 @@ public abstract class Action {
 
     public int getAmount() {
         return amount;
+    }
+
+    public GamePhase getPhase() {
+        return phase;
+    }
+
+    public void setPhase(GamePhase phase) {
+        this.phase = phase;
     }
 }

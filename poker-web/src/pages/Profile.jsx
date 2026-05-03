@@ -1,9 +1,11 @@
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { usePlayerStats } from '../hooks/usePlayerStats';
 import { classifyPlayerStyle, formatPercent } from '../utils/playerStyle';
 import styles from './Profile.module.css';
 
 export default function Profile({ playerId, onBack }) {
+  const { t } = useTranslation(['profile', 'common']);
   const { stats, style } = usePlayerStats(playerId);
   const [window, setWindow] = useState('allTime');
 
@@ -11,10 +13,10 @@ export default function Profile({ playerId, onBack }) {
     return (
       <div className={styles.profile}>
         <div className={styles.header}>
-          <button className={styles.backBtn} onClick={onBack}>← 返回</button>
+          <button className={styles.backBtn} onClick={onBack}>{t('common:back')}</button>
           <span className={styles.playerName}>{playerId}</span>
         </div>
-        <div className={styles.empty}>暂无数据</div>
+        <div className={styles.empty}>{t('profile:noData')}</div>
       </div>
     );
   }
@@ -35,13 +37,15 @@ export default function Profile({ playerId, onBack }) {
     { label: 'WTSD', value: formatPercent(priv.wtsd || 0), quality: 'avg' },
     { label: 'W$SD', value: formatPercent(priv.wsd || 0), quality: getWsdQuality(priv.wsd) },
     { label: 'Fold to CB', value: formatPercent(priv.foldToCbet || 0), quality: 'avg' },
-    { label: '总手数', value: stats.allTimeHands || 0, quality: 'avg' },
+    { label: t('profile:totalHands'), value: stats.allTimeHands || 0, quality: 'avg' },
   ];
+
+  const timeLabels = { allTime: t('profile:timeAll'), recent: t('profile:timeRecent'), session: t('profile:timeSession') };
 
   return (
     <div className={styles.profile}>
       <div className={styles.header}>
-        <button className={styles.backBtn} onClick={onBack}>← 返回</button>
+        <button className={styles.backBtn} onClick={onBack}>{t('common:back')}</button>
         <span className={styles.playerName}>{stats.displayName || playerId}</span>
       </div>
 
@@ -60,7 +64,7 @@ export default function Profile({ playerId, onBack }) {
             className={`${styles.tab} ${window === w ? styles.active : ''}`}
             onClick={() => setWindow(w)}
           >
-            {w === 'allTime' ? '全部' : w === 'recent' ? '近500手' : '本场'}
+            {timeLabels[w]}
           </button>
         ))}
       </div>
