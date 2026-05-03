@@ -11,7 +11,9 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
     @JsonSubTypes.Type(value = GameResultMessage.class, name = "GAME_RESULT"),
     @JsonSubTypes.Type(value = RoomListMessage.class, name = "ROOM_LIST"),
     @JsonSubTypes.Type(value = RoomCreatedMessage.class, name = "ROOM_CREATED"),
-    @JsonSubTypes.Type(value = ErrorMessage.class, name = "ERROR")
+    @JsonSubTypes.Type(value = ErrorMessage.class, name = "ERROR"),
+    @JsonSubTypes.Type(value = PlayerStatsMessage.class, name = "PLAYER_STATS"),
+    @JsonSubTypes.Type(value = PlayerStyleMessage.class, name = "PLAYER_STYLE")
 })
 public abstract class ServerMessage {
     private String type;
