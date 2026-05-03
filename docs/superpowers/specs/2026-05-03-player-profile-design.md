@@ -48,9 +48,9 @@ ReplayRecorder.onHandCompleted()
     ↓
 ReplayStore.saveHand()          PlayerStatsService.processHand()
     ↓                                    ↓
-JSON文件                           MongoDB (player_profiles)
+JSON Files                         MongoDB (player_profiles)
     ↓                                    ↓
-回放功能                          实时统计查询
+Replay Feature                   Real-time Stats Query
 ```
 
 ## Data Model
@@ -84,6 +84,7 @@ JSON文件                           MongoDB (player_profiles)
   "recent": {
     "windowSize": 500,
     "handsPlayed": 500,
+    "handIds": ["hand_12345", "hand_12344", "..."],  // Circular buffer for eviction
     "stats": { /* Same structure as allTime */ }
   },
 
@@ -188,12 +189,34 @@ void updateStats(String playerId, HandRecord hand) {
             if (isPostFlop(a)) window.af.opportunities++;
         }
 
-        // WTSD, W$SD, Fold to Cbet - similar logic
+        // WTSD: player didn't fold and hand reached showdown
+        if (!foldedBeforeShowdown(hand, playerId) && isShowdown(hand)) {
+            window.wtsd.count++;
+        }
+        window.wtsd.opportunities++;
+
+        // W$SD: player won at showdown
+        if (isShowdown(hand) && isWinner(hand, playerId)) {
+            window.wsd.count++;
+        }
+        if (isShowdown(hand) && !foldedBeforeShowdown(hand, playerId)) {
+            window.wsd.opportunities++;
+        }
+
+        // Fold to Cbet: player folded facing a continuation bet
+        if (facesCbet(hand, playerId) && foldedToCbet(hand, playerId)) {
+            window.foldToCbet.count++;
+        }
+        if (facesCbet(hand, playerId)) {
+            window.foldToCbet.opportunities++;
+        }
     }
 
-    // Rolling window: evict oldest hands
-    if (recent.handsPlayed > 500) {
-        evictOldestHand(recent, playerId);
+    // Rolling window: evict oldest hands (circular buffer with hand IDs)
+    recent.handIds.add(hand.getHandId());
+    if (recent.handIds.size() > 500) {
+        String oldestHandId = recent.handIds.remove(0);
+        revertStatsFromHand(recent, oldestHandId, playerId);
     }
 
     saveProfile(profile);

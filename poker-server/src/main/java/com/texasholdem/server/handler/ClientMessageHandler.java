@@ -15,6 +15,7 @@ import org.springframework.stereotype.Controller;
 import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Controller
 public class ClientMessageHandler {
@@ -157,13 +158,20 @@ public class ClientMessageHandler {
 
         HintResult result = room.getHint(userId);
         if (result != null) {
-            HintResultMessage msg = new HintResultMessage(
-                    request.getRoomId(),
-                    result.getSuggestedAction(),
-                    result.getHandStrength(),
-                    result.getPotOdds(),
-                    result.getReasoning()
-            );
+            HintResultMessage msg = new HintResultMessage();
+            msg.setGameId(request.getRoomId());
+            msg.setSuggestedAction(result.getSuggestedAction());
+            msg.setHandStrength(result.getHandStrength());
+            msg.setPotOdds(result.getPotOdds());
+            msg.setReasoning(result.getReasoning());
+            msg.setHandRankName(result.getHandRankName());
+            msg.setSimpleReasoning(result.getSimpleReasoning());
+            msg.setToCall(result.getToCall());
+            msg.setTotalPot(result.getTotalPot());
+            msg.setStrengthFactors(result.getStrengthFactors().stream()
+                    .map(f -> new HintResultMessage.StrengthFactorDto(
+                            f.getLabel(), f.getValue(), f.getDescription()))
+                    .collect(Collectors.toList()));
             broadcastService.sendToUser(userId, "/queue/hint-result", msg);
         }
     }
