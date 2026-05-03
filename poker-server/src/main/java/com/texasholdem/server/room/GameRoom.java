@@ -8,6 +8,7 @@ import com.texasholdem.core.engine.GameEngine;
 import com.texasholdem.core.model.*;
 import com.texasholdem.server.replay.ReplayRecorder;
 import com.texasholdem.server.service.BroadcastService;
+import com.texasholdem.server.stats.PlayerStatsService;
 import com.texasholdem.server.service.GameStateProjection;
 import com.texasholdem.server.session.PlayerConnection;
 
@@ -34,6 +35,7 @@ public class GameRoom {
     private final BuiltinAgent grpcAgent;
     private final BroadcastService broadcastService;
     private final ReplayRecorder replayRecorder;
+    private final PlayerStatsService statsService;
     private final ExecutorService aiExecutor;
 
     private GameState currentGameState;
@@ -49,12 +51,14 @@ public class GameRoom {
 
     public GameRoom(String roomId, String name, GameConfig gameConfig,
                     BroadcastService broadcastService, ReplayRecorder replayRecorder,
+                    PlayerStatsService statsService,
                     BuiltinAgent simpleAgent, BuiltinAgent grpcAgent) {
         this.roomId = roomId;
         this.name = name;
         this.gameConfig = gameConfig;
         this.broadcastService = broadcastService;
         this.replayRecorder = replayRecorder;
+        this.statsService = statsService;
         this.simpleAgent = simpleAgent;
         this.grpcAgent = grpcAgent;
         this.aiExecutor = Executors.newCachedThreadPool();
@@ -321,6 +325,14 @@ public class GameRoom {
 
         if (replayRecorder != null) {
             replayRecorder.onHandCompleted(sessionId, handNumber, currentGameState, finalChips);
+        }
+
+        if (statsService != null) {
+            try {
+                statsService.processHand(sessionId, handNumber, currentGameState, connections);
+            } catch (Exception e) {
+                log.warn("Failed to process player stats: {}", e.getMessage());
+            }
         }
 
         broadcastGameState();

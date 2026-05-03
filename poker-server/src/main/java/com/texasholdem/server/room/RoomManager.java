@@ -5,6 +5,7 @@ import com.texasholdem.common.protocol.RoomInfo;
 import com.texasholdem.core.model.GameConfig;
 import com.texasholdem.server.replay.ReplayRecorder;
 import com.texasholdem.server.service.BroadcastService;
+import com.texasholdem.server.stats.PlayerStatsService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -19,14 +20,17 @@ public class RoomManager {
     private final AtomicInteger roomCounter = new AtomicInteger(0);
     private final BroadcastService broadcastService;
     private final ReplayRecorder replayRecorder;
+    private final PlayerStatsService statsService;
     private final BuiltinAgent simpleAgent;
     private final BuiltinAgent grpcAgent;
 
     public RoomManager(BroadcastService broadcastService, ReplayRecorder replayRecorder,
+                       PlayerStatsService statsService,
                        BuiltinAgent simpleAgent,
                        @Autowired(required = false) @Qualifier("grpcAgent") BuiltinAgent grpcAgent) {
         this.broadcastService = broadcastService;
         this.replayRecorder = replayRecorder;
+        this.statsService = statsService;
         this.simpleAgent = simpleAgent;
         this.grpcAgent = grpcAgent;
     }
@@ -34,7 +38,8 @@ public class RoomManager {
     public GameRoom createRoom(String name, int maxPlayers, int smallBlind, int bigBlind, int startingChips) {
         String roomId = "room_" + roomCounter.incrementAndGet();
         GameConfig config = new GameConfig(smallBlind, bigBlind, maxPlayers, startingChips);
-        GameRoom room = new GameRoom(roomId, name, config, broadcastService, replayRecorder, simpleAgent, grpcAgent);
+        GameRoom room = new GameRoom(roomId, name, config, broadcastService, replayRecorder,
+                statsService, simpleAgent, grpcAgent);
         rooms.put(roomId, room);
         return room;
     }
