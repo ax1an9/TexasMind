@@ -11,7 +11,7 @@ COPY poker-server/pom.xml poker-server/
 # cache dependencies
 RUN mvn dependency:go-offline -B
 COPY . .
-RUN mvn package -pl poker-server -am -DskipTests -B
+RUN mvn package -pl poker-server -am -DskipTests -Dprotobuf.skip=true -B
 
 # -- run --
 FROM eclipse-temurin:8-jre

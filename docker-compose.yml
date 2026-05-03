@@ -25,7 +25,10 @@ services:
     ports:
       - "8080:8080"
     depends_on:
+      - mongo
       - agent
+    environment:
+      - SPRING_DATA_MONGODB_URI=mongodb://mongo:27017/poker
     command:
       - "--agent.type=grpc"
       - "--agent.grpc.host=agent"
