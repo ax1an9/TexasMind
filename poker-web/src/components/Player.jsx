@@ -1,4 +1,5 @@
 import Card from './Card';
+import PlayerHUD from './PlayerHUD';
 import styles from './Player.module.css';
 
 export default function Player({ player, isCurrentPlayer, isSelf, showCards }) {
@@ -21,6 +22,7 @@ export default function Player({ player, isCurrentPlayer, isSelf, showCards }) {
       </div>
       <div className={styles.chips}>${player.chips}</div>
       {stateLabel && <div className={styles.state}>{stateLabel}</div>}
+      {!player.agentType && <PlayerHUD playerId={player.seatId} isSelf={isSelf} />}
       <div className={styles.cards}>
         {player.holeCards && player.holeCards.length > 0 ? (
           player.holeCards.map((c, i) => (
